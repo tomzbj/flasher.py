@@ -1,15 +1,32 @@
-#include "misc.h" //debug
+#include <stdlib.h>
 #include <string.h>
 #include "flasher.h"
-#include "crc32.h"
 
 static fl_config_t g;
 
 #define MAX_PACK_SIZE 1024
 
+static unsigned long crc32_soft(unsigned long crc, const void* msg, int size)
+{
+    const unsigned long polynormial = 0xedb88320;
+    for(int i = 0; i < size; i++) {
+        crc ^= *(unsigned char*)(msg + i);
+        for(int j = 0; j < 8; j++) {
+            int lsb = crc % 2;
+            crc >>= 1;
+            if(lsb)
+                crc ^= polynormial;
+        }
+    }
+    return crc;
+}
+
 void fl_init(fl_config_t* cfg)
 {
     memcpy(&g, cfg, sizeof(fl_config_t));
+    if(g.crc32_f == NULL) {
+        g.crc32_f = crc32_soft;
+    }
 }
 
 static void ReadImage(unsigned long pos, int size)
@@ -28,19 +45,16 @@ static void ReadCRC32(unsigned long pos, int total_size)
     int size = MAX_PACK_SIZE;
     unsigned long crc;
 
-    CRC32_Init();
     crc = 0xffffffff;
     while(total_size > 0) {
         if(total_size < size)
             size = total_size;
         g.read_f(pos, size, buf);
-        CRC32_Calc(buf, size);
-//        crc = CRC32(crc, buf, size);
+        crc = g.crc32_f(crc, buf, size);
         pos += size;
         total_size -= size;
     }
-//    crc = ~crc;
-    crc = ~CRC_GetCRC();
+    crc = ~crc;
     g.uwrite_f(&crc, 4);
 }
 
@@ -81,7 +95,6 @@ static void CheckBlockEmpty(unsigned long pos)
     g.uwrite_f(&ret, 1);
 }
 
-//void fl_Parse(USART_TypeDef* USARTx, const unsigned char* msg, int size)
 void fl_parse(const void* pmsg, int msg_size)
 {
     unsigned char* msg = (unsigned char*)pmsg;

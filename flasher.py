@@ -7,6 +7,8 @@ import serial
 
 BAUDRATE = 1000000
 READ_PACKET_SIZE = 512
+WRITE_PACKET_SIZE = 1024
+ERASE_PACKET_SIZE = 32768
 BLOCK_SIZE = 4096
 LIMIT_256K = True
 MAX_FILES = 48
@@ -200,7 +202,7 @@ class Cli:
         """ 按指定地址和长度擦除 """
         ret = b''
         count = 0
-        size = 32768
+        size = ERASE_PACKET_SIZE
         if show_progress == True:
             total_count = total_size // size
             if total_size % size != 0:
@@ -227,7 +229,7 @@ class Cli:
     def __Write(self, content, addr, show_progress):
         """ 按指定content和地址写入 """
 
-        size = 1024
+        size = WRITE_PACKET_SIZE
         count = 0
         total_count = len(content) // size
         if total_count == 0:

@@ -2,7 +2,6 @@
 #define _CRC32_H
 
 void CRC32_Init(void);
-void CRC32_Calc(const unsigned char* msg, int size);
-unsigned long CRC32(unsigned long crc, unsigned char* msg, int size);
+unsigned long CRC32_Calc(unsigned long initial, const void* msg, int size);
 
 #endif

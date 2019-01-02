@@ -1,7 +1,9 @@
-#include "../thirdparty/flasher/flasher.h"
+#include <stdlib.h>
+#include "flasher.h"
 #include "misc.h"
 #include "spiflash.h"
 #include "usart_f0.h"
+#include "crc32.h"
 
 void SPI1_SetCS(int cs)
 {
@@ -145,11 +147,14 @@ void SPIFLASH_Config(void)
     SPIFLASH_Init(&scfg);
     SPIFLASH_LeaveLowPowerMode();
 
+    CRC32_Init();
     static fl_config_t icfg;
     icfg.read_f = SPIFLASH_FastRead;
     icfg.write_f = SPIFLASH_Write;
     icfg.erase_f = SPIFLASH_Erase;
     icfg.readinfo_f = SPIFLASH_ReadJedecID;
     icfg.uwrite_f = uputs;
+//    icfg.crc32_f = NULL;
+    icfg.crc32_f = CRC32_Calc;
     fl_init(&icfg);
 }
