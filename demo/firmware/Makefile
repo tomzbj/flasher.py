@@ -46,8 +46,8 @@ DLIBS = -L. -lstm32f030_8m
 ASRC = $(STARTUPDIR)/startup_$(shell echo $(MCU) | tr A-Z a-z).s
 
 ## List C source files here
-SRC = $(wildcard *.c _libs/*.c app/*.c platform/*.c drv/*.c thirdparty/*/*.c)
-ASRC += $(wildcard *.s _libs/*.s app/*.s platform/*/*.s thirdparty/*/*.s) 
+SRC = $(wildcard *.c _libs/*.c app/*.c platform/*.c drv/*.c thirdparty/*/*.c) #*/
+ASRC += $(wildcard *.s _libs/*.s app/*.s platform/*/*.s thirdparty/*/*.s)  #*/
 
 ## List all user directories here
 UINCDIR = . ./_libs $(CORELIBDIR) $(DEV_DIR) $(STDPHDRV_INCDIR)
@@ -81,7 +81,7 @@ CPFLAGS += -ffunction-sections -fdata-sections -std=gnu99
 LDFLAGS = $(MCFLAGS) -mthumb -nostartfiles -T$(LDSCRIPT)
 LDFLAGS += -Wl,-Map=$(FULL_PRJ).map,--cref,--no-warn-mismatch $(LIBDIR)
 LDFLAGS += -fno-common
-LDFLAGS += -Wl,--gc-sections -specs=nano.specs -u _printf_float #-u _scanf_float
+LDFLAGS += -Wl,--gc-sections -specs=nano.specs #-u _printf_float #-u _scanf_float
  
 TEXT =
 # Generate dependency information

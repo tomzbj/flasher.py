@@ -75,7 +75,7 @@ def ViewMsg(msg):
 def scan():
     """ 检测可用串口 """
     ports = []
-    for i in range(16):
+    for i in range(32):
         try:
             port = 'COM' + str(i + 1)
             s = serial.Serial(port)
