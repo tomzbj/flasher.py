@@ -1,22 +1,25 @@
 #ifndef _FLASHER_H
 #define _FLASHER_H
 
-typedef int (*fl_read_t)(unsigned long addr, int size, void* buf);
-typedef int (*fl_write_t)(unsigned long addr, int size, const void* buf);
-typedef int (*fl_erase_t)(unsigned long addr, int size);
-typedef unsigned long (*fl_readinfo_t)(void);
-typedef int (*fl_uartwrite_t)(const void* data, int size);
-typedef unsigned long (*fl_crc32_t)(unsigned long initial, const void* data, int size);
 typedef struct {
-    fl_read_t read_f;
-    fl_write_t write_f;
-    fl_erase_t erase_f;
-    fl_readinfo_t readinfo_f;
-    fl_uartwrite_t uwrite_f;
-    fl_crc32_t crc32_f;
-} fl_config_t;
+    int (*read_f)(unsigned long addr, int size, void* buf);
+    int (*write_f)(unsigned long addr, int size, const void* buf);
+    int (*erase_f)(unsigned long addr, int size);
+    unsigned long (*readinfo_f)(void);
+    void (*uwrite_f)(const void* data, int size);
+    unsigned long (*crc32_f)(unsigned long initial, const void* data, int size);
+} fl_cfg_t;
 
-void fl_init(fl_config_t* cfg);
+typedef struct {
+    unsigned char fname[40];
+    unsigned long addr, size, timestamp, crc32;
+} fl_finfo_t;
+
+void fl_init(fl_cfg_t* cfg);
+// called by usart
 void fl_parse(const void* msg, int size);
+
+int fl_get_file_num(void);
+fl_finfo_t* fl_get_file_info(int id);
 
 #endif

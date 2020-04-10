@@ -5,13 +5,15 @@ import time
 import zlib
 import serial
 
-BAUDRATE = 1000000
-READ_PACKET_SIZE = 512
+BAUDRATE = 500000
+READ_PACKET_SIZE = 1024
 WRITE_PACKET_SIZE = 1024
 ERASE_PACKET_SIZE = 32768
 BLOCK_SIZE = 4096
-LIMIT_256K = True
+#LIMIT_256K = True
+LIMIT_256K = False
 MAX_FILES = 48
+VIEWMSG = False
 
 vendors = {
     #     0x01: ("AMD", "AM"),    # AM29 series only
@@ -102,11 +104,12 @@ class Cli:
 
     def SendCmd(self, cmd): 
         """ 发送命令, 读取全部返回数据 """
-        # ViewMsg(cmd) # for debug
+        if VIEWMSG == True:
+            ViewMsg(cmd) # for debug
         self.ser.write(cmd)
         timeout = time.time() + 1.5
         while self.ser.in_waiting == 0 and time.time() < timeout:
-            time.sleep(0.01)
+            time.sleep(0.03)
         ret = self.ser.read_all()
         return ret
 
@@ -143,7 +146,9 @@ class Cli:
             cmd += addr.to_bytes(4, byteorder='little')
             cmd = AddLRC(cmd)
             for i in range(10):
+                #print(cmd)
                 msg = self.SendCmd(cmd)
+                #print(msg, len(msg), size)
                 if len(msg) == size:
                     break
             else:

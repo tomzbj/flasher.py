@@ -22,11 +22,9 @@ unsigned char SPI1_WriteByte(unsigned char data)
     return SPI_ReceiveData8(SPI1);
 }
 
-int uputs(const void* data, int size)
+void uputs(const void* data, int size)
 {
     USART_WriteData(USART2, data, size);
-
-    return 0;
 }
 
 #define BUFFER_SIZE 256
@@ -148,7 +146,7 @@ void SPIFLASH_Config(void)
     SPIFLASH_LeaveLowPowerMode();
 
     CRC32_Init();
-    static fl_config_t icfg;
+    static fl_cfg_t icfg;
     icfg.read_f = SPIFLASH_FastRead;
     icfg.write_f = SPIFLASH_Write;
     icfg.erase_f = SPIFLASH_Erase;
